@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 
+import environ
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -37,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_elasticsearch_dsl',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -48,6 +52,68 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+ELASTICSEARCH_DSL={
+    'default': {
+        'hosts': 'https://elastic:qKwEQBnRvJ-7lFGQNpSY@localhost:9200',
+        'verify_certs': False,
+        'ca_certs': None
+    },
+}
+
+
+env = environ.Env(
+    DEBUG=(bool, False),
+    NEXT_PUBLIC_BACKEND_URL=(str, "https://localhost:8000"),
+    ALLOWED_HOSTS=(list, []),
+    USE_X_FORWARDED_HOST=(bool, False),
+    ELASTICSEARCH_APP_AUDIT_LOG_INDEX=(str, "app_audit_log"),
+    ELASTICSEARCH_HOST=(str, ""),
+    ELASTICSEARCH_PORT=(int, 0),
+    ELASTICSEARCH_USERNAME=(str, ""),
+    ELASTICSEARCH_PASSWORD=(str, ""),
+    CLEAR_AUDIT_LOG_ENTRIES=(bool, True),
+    ENABLE_SEND_AUDIT_LOG=(bool, True),
+    DB_PREFIX=(str, ""),
+    AUDIT_LOG_ORIGIN=(str, ""),
+    AUDIT_TABLE_NAME=(str,"audit_logs"),
+    ELASTICSEARCH_SCHEME=(str, "https"),
+    DATE_TIME_PARENT_FIELD = (str, "audit_event"),
+    DATE_TIME_FIELD = (str, "date_time"),
+    DATABASE_URL = (str, ""),
+    DATABASE_PASSWORD = (str, ""),
+    DB_USE_SSL = (bool, False),
+    SSL_CA = (str, ""),
+    SSL_KEY = (str, ""),
+    SSL_CERT = (str, ""),
+    SSL_CIPHER = (str, "")
+)
+
+# Audit logging
+AUDIT_LOG_ORIGIN = env("AUDIT_LOG_ORIGIN")
+CLEAR_AUDIT_LOG_ENTRIES = env("CLEAR_AUDIT_LOG_ENTRIES")
+ELASTICSEARCH_APP_AUDIT_LOG_INDEX = env("ELASTICSEARCH_APP_AUDIT_LOG_INDEX")
+ELASTICSEARCH_HOST = env("ELASTICSEARCH_HOST")
+ELASTICSEARCH_PORT=0
+if (env("ELASTICSEARCH_PORT")):
+  ELASTICSEARCH_PORT = env("ELASTICSEARCH_PORT")
+else:
+  if(ELASTICSEARCH_HOST.count(":") > 0):
+    hostAndPort=ELASTICSEARCH_HOST.split(":", 1)
+    ELASTICSEARCH_HOST=hostAndPort[0]
+    ELASTICSEARCH_PORT=int(hostAndPort[1])
+    
+ELASTICSEARCH_USERNAME = env("ELASTICSEARCH_USERNAME")
+ELASTICSEARCH_PASSWORD = env("ELASTICSEARCH_PASSWORD")
+ENABLE_SEND_AUDIT_LOG = env("ENABLE_SEND_AUDIT_LOG")
+
+# Field names for fetching the elastic timestamp from json data
+DATE_TIME_PARENT_FIELD =  env("DATE_TIME_PARENT_FIELD")
+DATE_TIME_FIELD =  env("DATE_TIME_FIELD")
+
+# Sheme for connecting to elastic, for example: "http", or: "https"
+ELASTICSEARCH_SCHEME = env("ELASTICSEARCH_SCHEME")
+
 
 ROOT_URLCONF = 'audit_logging_monitoring.urls'
 
