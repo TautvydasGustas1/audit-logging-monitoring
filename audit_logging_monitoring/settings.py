@@ -61,6 +61,7 @@ ELASTICSEARCH_DSL={
     },
 }
 
+ALLOWED_HOSTS = ['*']
 
 env = environ.Env(
     DEBUG=(bool, False),
