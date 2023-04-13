@@ -53,13 +53,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ELASTICSEARCH_DSL={
-    'default': {
-        'hosts': 'https://elastic:qKwEQBnRvJ-7lFGQNpSY@localhost:9200',
-        'verify_certs': False,
-        'ca_certs': None
-    },
-}
 
 ALLOWED_HOSTS = ['*']
 
@@ -89,6 +82,18 @@ env = environ.Env(
     SSL_CERT = (str, ""),
     SSL_CIPHER = (str, "")
 )
+
+ELASTICSEARCH_DSL={
+    "default": {
+            "hosts": env("ELASTICSEARCH_HOST"),
+            "http_auth": (
+                env("ELASTICSEARCH_USERNAME"),
+                env("ELASTICSEARCH_PASSWORD"),
+            )
+            if env("ELASTICSEARCH_USERNAME") and env("ELASTICSEARCH_PASSWORD")
+            else None,
+        }
+}
 
 # Audit logging
 AUDIT_LOG_ORIGIN = env("AUDIT_LOG_ORIGIN")
