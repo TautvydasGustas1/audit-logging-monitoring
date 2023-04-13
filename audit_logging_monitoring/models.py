@@ -11,12 +11,6 @@ class AuditLogEntry(models.Model):
     class Meta:
         app_label = 'auditlog'
 
-    # def pre_save(self, model_instance, add):
-    #     return timezone.now()
-
-    # #usage
-    # created_at = models.DateField(default=timezone.now)
-
     def __str__(self):
         return ", ".join(
             [

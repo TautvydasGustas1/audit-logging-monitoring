@@ -18,8 +18,5 @@ from django.urls import path
 from audit_logging_monitoring import monitoring
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', monitoring.main),
-    path('api/create', monitoring.create),
-    path('api/search', monitoring.search)
+    path('api/monitor', monitoring.monitor)
 ]
