@@ -1,0 +1,14 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# Editor backups
+*~
+
+# Django stuff
+db.sqlite3
+
+#log files
+**/*.log
+
+#Possible eclipse project file
+.project
