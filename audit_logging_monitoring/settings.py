@@ -61,11 +61,12 @@ env = environ.Env(
     NEXT_PUBLIC_BACKEND_URL=(str, "https://localhost:8000"),
     ALLOWED_HOSTS=(list, []),
     USE_X_FORWARDED_HOST=(bool, False),
-    ELASTICSEARCH_APP_AUDIT_LOG_INDEX=(str, "app_audit_log"),
-    ELASTICSEARCH_HOST=(str, ""),
-    ELASTICSEARCH_PORT=(int, 0),
-    ELASTICSEARCH_USERNAME=(str, ""),
-    ELASTICSEARCH_PASSWORD=(str, ""),
+    ELASTICSEARCH_APP_AUDIT_LOG_INDEX=(str, "auditlog-django-test-prod"),
+    ELASTICSEARCH_APP_AUDIT_DATA_STREAM=(str, "audit-auditlog-django-test-prod"),
+    ELASTICSEARCH_HOST=(str, ''),
+    ELASTICSEARCH_PORT=(int, 443),
+    ELASTICSEARCH_USERNAME=(str, ''),
+    ELASTICSEARCH_PASSWORD=(str, ''),
     CLEAR_AUDIT_LOG_ENTRIES=(bool, True),
     ENABLE_SEND_AUDIT_LOG=(bool, True),
     DB_PREFIX=(str, ""),
@@ -86,12 +87,14 @@ env = environ.Env(
 ELASTICSEARCH_DSL={
     "default": {
             "hosts": env("ELASTICSEARCH_HOST"),
+            "use_ssl": True,
             "http_auth": (
                 env("ELASTICSEARCH_USERNAME"),
                 env("ELASTICSEARCH_PASSWORD"),
             )
             if env("ELASTICSEARCH_USERNAME") and env("ELASTICSEARCH_PASSWORD")
             else None,
+            
         }
 }
 
@@ -100,18 +103,11 @@ AUDIT_LOG_ORIGIN = env("AUDIT_LOG_ORIGIN")
 CLEAR_AUDIT_LOG_ENTRIES = env("CLEAR_AUDIT_LOG_ENTRIES")
 ELASTICSEARCH_APP_AUDIT_LOG_INDEX = env("ELASTICSEARCH_APP_AUDIT_LOG_INDEX")
 ELASTICSEARCH_HOST = env("ELASTICSEARCH_HOST")
-# ELASTICSEARCH_PORT=0
-# if (env("ELASTICSEARCH_PORT")):
-#   ELASTICSEARCH_PORT = env("ELASTICSEARCH_PORT")
-# else:
-#   if(ELASTICSEARCH_HOST.count(":") > 0):
-#     hostAndPort=ELASTICSEARCH_HOST.split(":", 1)
-#     ELASTICSEARCH_HOST=hostAndPort[0]
-#     ELASTICSEARCH_PORT=int(hostAndPort[1])
-    
+ELASTICSEARCH_PORT=env("ELASTICSEARCH_PORT")
+ELASTICSEARCH_APP_AUDIT_DATA_STREAM=env("ELASTICSEARCH_APP_AUDIT_DATA_STREAM")
 ELASTICSEARCH_USERNAME = env("ELASTICSEARCH_USERNAME")
 ELASTICSEARCH_PASSWORD = env("ELASTICSEARCH_PASSWORD")
-ENABLE_SEND_AUDIT_LOG = env("ENABLE_SEND_AUDIT_LOG")
+# ENABLE_SEND_AUDIT_LOG = env("ENABLE_SEND_AUDIT_LOG")
 
 # Field names for fetching the elastic timestamp from json data
 DATE_TIME_PARENT_FIELD =  env("DATE_TIME_PARENT_FIELD")
