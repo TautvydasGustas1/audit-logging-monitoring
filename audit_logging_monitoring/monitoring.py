@@ -6,20 +6,23 @@ from audit_logging_monitoring.documents import AuditLogDocument
 from django.conf import settings
 import requests
 import json
+import pytz
+
 
 def main(request):
     
     return JsonResponse({'response':"ElasticCloud audit log service OK"})
 
 def monitor(request):
-    date_now = datetime.datetime.now()
-    date_yesterday = datetime.datetime.now() - datetime.timedelta(1)
+    date_now = datetime.datetime.now((pytz.timezone('Europe/Helsinki'))).strftime("%Y-%m-%dT%H:%M:%SZ")
+    date_yesterday = (datetime.datetime.now((pytz.timezone('Europe/Helsinki'))) - datetime.timedelta(1)).strftime("%Y-%m-%dT%H:%M:%SZ")
     found = False
+    
 
     try:
 
         url = "https://" + str(settings.ELASTICSEARCH_HOST) + "/" + str(settings.ELASTICSEARCH_APP_AUDIT_DATA_STREAM) + "/_doc/?pretty"
-        data = {"@timestamp": date_now.strftime("%Y-%m-%dT%H:%M:%SZ"), "message": "Login successful"}
+        data = {"@timestamp": date_now, "message": "Entry added"}
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         r = requests.post(url, data=json.dumps(data), headers=headers, auth=(str(settings.ELASTICSEARCH_USERNAME), str(settings.ELASTICSEARCH_PASSWORD)))
         print(r.text)
@@ -32,13 +35,8 @@ def monitor(request):
         return JsonResponse(status=500, data={'response':"Error saving new entry to ElasticSearch"})
     
 
-    date_now = datetime.datetime.now()
-    date_yesterday = datetime.datetime.now() - datetime.timedelta(1)
-    found = False
-    
-
     try:
-        s = AuditLogDocument.search().query('range', **{'@timestamp': {'gte': date_yesterday, 'lte': date_now}}).sort("-@timestamp")
+        s = AuditLogDocument.search().query('range', **{'@timestamp': {'gte': date_yesterday, 'lte': date_now}}).sort('-@timestamp')
     except Exception as err: 
         print("Error getting entry from elasticsearch:", err)
         return JsonResponse(status=500, data={'response':"Error getting entry from ElasticSearch"})
